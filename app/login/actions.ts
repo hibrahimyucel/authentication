@@ -38,8 +38,8 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   await createSession(testUser.id);
-
-  redirect("/dashboard");
+  return { success: true, user: testUser.id };
+  //redirect("/dashboard");
 }
 
 export async function logout() {

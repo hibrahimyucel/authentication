@@ -11,7 +11,7 @@ export default async function middleware(req: NextRequest) {
   console.log("middleware ", path, isPublicRoute);
   const cookie = (await cookies()).get("session")?.value;
   const session = await decrypt(cookie);
-
+  /*
   if (isPublicRoute) {
     if (path == publicRoutes[0] && session?.userId)
       return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
@@ -19,7 +19,7 @@ export default async function middleware(req: NextRequest) {
   }
   if (!isPublicRoute && !session?.userId) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
-  }
+  }*/
 }
 export const config = {
   matcher: [
