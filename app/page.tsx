@@ -1,7 +1,9 @@
 export default function Home() {
   return (
-    <main>
-      <h1 className="text-2xl font-bold">Cosden Solutions</h1>
-    </main>
+    <div className="w-full">
+      <h1 className="bg-background border-diffcolor flex w-full border pl-1 font-bold">
+        Anasayfa
+      </h1>
+    </div>
   );
 }
