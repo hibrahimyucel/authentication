@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { decrypt } from "./lib/auth/session";
+import { decrypt } from "./authentication/actions/session";
 
 const publicRoutes = ["/login", "/"];
 
@@ -10,9 +10,9 @@ export default async function middleware(req: NextRequest) {
   const isPublicRoute = publicRoutes.includes(path);
 
   const cookie = (await cookies()).get("session")?.value;
-  console.log(cookie);
+
   const session = await decrypt(cookie);
-  console.log("MD : ", path, isPublicRoute, session);
+
   /*
   if (isPublicRoute) {
     if (path == publicRoutes[0] && session?.userId)

@@ -1,10 +1,9 @@
 "use client";
-import { useAuth } from "@/lib/AuthProvider";
-import { logout } from "../login/actions";
-import ProtectedRoute from "@/lib/auth/auth-protected";
-
+import { useAuth } from "@/authentication/context/authProvider";
+import ProtectedRoute from "@/authentication/context/authProtected";
+import { logout } from "@/authentication/actions/actions";
 export default function Dashboard() {
-  const { handleSignOut } = useAuth();
+  const { setUser } = useAuth();
   return (
     <ProtectedRoute>
       <div className="flex w-full flex-col">
@@ -14,7 +13,7 @@ export default function Dashboard() {
         <div className="flex justify-end p-1">
           <button
             onClick={() => {
-              logout().then(() => handleSignOut());
+              logout().then(() => setUser(null));
             }}
             className="bg-buttoncolor flex rounded-md p-2"
           >

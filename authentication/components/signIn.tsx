@@ -1,17 +1,16 @@
 "use client";
-
 import { useActionState, useEffect } from "react";
-import { signIn } from "./actions";
-import { useAuth } from "@/lib/AuthProvider";
 import { redirect } from "next/navigation";
+import { signIn } from "../actions/actions";
+import { useAuth } from "../context/authProvider";
 
 export function SignInForm() {
   const [state, signInAction, isPending] = useActionState(signIn, undefined);
-  const { userId, handleSignIn } = useAuth();
-  if (userId) redirect("/");
+  const { user, setUser } = useAuth();
+  if (user) redirect("/dashboard");
   useEffect(() => {
     if (state?.success) {
-      handleSignIn(state?.user);
+      setUser(state?.user);
       redirect("/");
     }
   }, [state]);

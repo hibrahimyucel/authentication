@@ -1,15 +1,6 @@
 import sql from "mssql";
 
 const mmbisConn = await sql.connect(`${process.env.MMBISDATABASE}`);
-export async function mssqlQuery(query: string) {
-  if (!mmbisConn.connected) await mmbisConn.connect();
-
-  const request = mmbisConn.request();
-  const result = await request.query(query);
-  console.log(query, result.recordset);
-
-  return result.recordset;
-}
 
 type signUpData = {
   username: string;
@@ -24,17 +15,17 @@ export async function signUpDB(value: signUpData) {
   (fk_user, providerId, accountId, password)
 VALUES (@fk_user,'email',@email,@password)`;
 
-  const Conn = await sql.connect(`${process.env.MMBISDATABASE}`);
-  const request = Conn.request();
+  if (!mmbisConn.connected) await mmbisConn.connect();
+  const request = mmbisConn.request();
 
   request.input("name", sql.VarChar(100), value.username);
   request.input("email", sql.VarChar(100), value.email);
   request.input("password", sql.VarChar(100), value.password);
+  const resultUser = await request.query(sqlInsertUser);
 
-  const result = await request.query(sqlInsertUser);
-  request.input("fk_user", sql.Int, result.recordset[0].Id);
-  const resultL = await request.query(sqlInsertAccount);
-  console.log(resultL);
+  request.input("fk_user", sql.Int, resultUser.recordset[0].Id);
+  const resultAccount = await request.query(sqlInsertAccount);
+  return resultAccount;
 }
 
 export async function signInDB(value: signUpData) {
@@ -50,8 +41,8 @@ export async function signInDB(value: signUpData) {
   FROM auth_account where accountId = @accountId
 `;
 
-  const Conn = await sql.connect(`${process.env.MMBISDATABASE}`);
-  const request = Conn.request();
+  if (!mmbisConn.connected) await mmbisConn.connect();
+  const request = mmbisConn.request();
 
   request.input("accountId", sql.VarChar(100), value.email);
 

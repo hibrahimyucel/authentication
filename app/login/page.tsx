@@ -1,8 +1,7 @@
 "use client";
-
 import { useState } from "react";
-import { SignInForm } from "./signIn";
-import { SignUpForm } from "./signUp";
+import { SignInForm } from "@/authentication/components/signIn";
+import { SignUpForm } from "@/authentication/components/signUp";
 
 export default function Login() {
   const [newUser, setNewUser] = useState<boolean>(false);

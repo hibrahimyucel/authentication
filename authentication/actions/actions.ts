@@ -1,16 +1,41 @@
 "use server";
-import { success, z } from "zod";
-import { signInSchema, signUpSchema } from "@/lib/auth/scheme";
-import { createSession, deleteSession } from "../../lib/auth/session";
-import { revalidatePath } from "next/cache";
-import { hashSync, genSaltSync, compareSync } from "bcrypt-ts";
-import { signInDB, signUpDB } from "@/lib/db/mssqlquery";
+import { z } from "zod";
+import { createSession, deleteSession } from "./session";
+import { hashSync, compareSync } from "bcrypt-ts";
+import { signInDB, signUpDB } from "./mssqlDb";
+
+const signInSchema = z.object({
+  email: z.email({ message: "Geçersiz e-posta" }).trim(),
+  password: z
+    .string()
+    .min(3, { message: "Şifre en az 3 karakter olmalı" })
+    .trim(),
+});
+
+const signUpSchema = z
+  .object({
+    username: z
+      .string()
+      .min(3, { message: "Kullanıcı adı en az 3 karakter olmalı" }),
+    email: z.email({ message: "Geçersiz e-posta" }).trim(),
+    password: z
+      .string()
+      .min(3, { message: "Şifre en az 3 karakter olmalı" })
+      .trim(),
+    password1: z
+      .string()
+      .min(3, { message: "Şifre en az 3 karakter olmalı" })
+      .trim(),
+  })
+  .refine((data) => data.password === data.password1, {
+    message: "Şifre eşleşmiyor.",
+    path: ["password1"],
+  });
 
 export async function signUp(prevState: unknown, formData: FormData) {
   const data = Object.fromEntries(formData);
   const result = signUpSchema.safeParse(data);
 
-  console.log(data);
   if (!result.success) {
     return {
       data: data,

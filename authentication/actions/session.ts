@@ -5,8 +5,17 @@ import { cookies } from "next/headers";
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
+export async function getAccessToken() {
+  const userId = await getUserId();
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+  return new SignJWT({ userId, expiresAt })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("15 m")
+    .sign(encodedKey);
+}
 export async function createSession(userId: string) {
-  console.log("userId : ", userId);
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const session = await encrypt({ userId, expiresAt });
 
