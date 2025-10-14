@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import MyProvider from "@/lib/auth/auth-provider";
+import Link from "next/link";
+import { AuthProvider } from "@/lib/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +29,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} text-2xl antialiased sm:text-sm`}
       >
-        <MyProvider>
-          <div className="flex h-dvh w-full grow">{children}</div>
-        </MyProvider>
+        <AuthProvider>
+          <div className="flex h-dvh w-full flex-col">
+            <div className="border-buttoncolor border p-1">
+              <Link href={"/"}>Anasayfa</Link>
+            </div>
+            <div className="border-buttoncolor grow border">{children}</div>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

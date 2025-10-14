@@ -1,18 +1,17 @@
 "use client";
 import { PropsWithChildren, useEffect } from "react";
 import { redirect } from "next/navigation";
-import { usemyContext } from "./auth-provider";
+import { useAuth } from "../AuthProvider";
 
 type ProtectedRouteProps = PropsWithChildren;
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { id } = usemyContext();
-
+  const { userId } = useAuth();
   useEffect(() => {
-    if (!id) {
+    if (!userId) {
       redirect("/login");
     }
-  }, [id]);
+  }, [userId]);
 
   return children;
 }

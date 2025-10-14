@@ -15,7 +15,12 @@ export async function createSession(userId: string) {
     expires: expiresAt,
   });
 }
-
+export async function getUserId(): Promise<string | null> {
+  const cookie = (await cookies()).get("session")?.value;
+  const session = await decrypt(cookie);
+  if (session?.userId) return session?.userId as string;
+  else return null;
+}
 export async function deleteSession() {
   (await cookies()).delete("session");
 }

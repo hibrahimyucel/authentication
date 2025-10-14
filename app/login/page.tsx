@@ -1,19 +1,24 @@
 "use client";
 
-import { usemyContext } from "@/lib/auth/auth-provider";
-import { LoginForm } from "./login-form";
-import { redirect } from "next/navigation";
+import { useState } from "react";
+import { SignInForm } from "./signIn";
+import { SignUpForm } from "./signUp";
 
 export default function Login() {
-  const { id } = usemyContext();
-  if (id) redirect("/");
+  const [newUser, setNewUser] = useState<boolean>(false);
   return (
-    <div className="flex w-full flex-col">
-      <h1 className="bg-background border-diffcolor flex w-full border pl-1 font-bold">
-        Giriş yap / Kayıt ol
-      </h1>
-      <div className="flex w-full justify-center p-1">
-        <LoginForm />
+    <div className="flex w-full justify-center gap-1">
+      <div className="flex flex-col pt-1">
+        <div className="flex">{newUser ? <SignUpForm /> : <SignInForm />}</div>
+        <div className="border-buttoncolor grid grid-cols-2 rounded-md border p-1">
+          <button
+            type="button"
+            className={`bg-buttoncolor col-start-${newUser ? "2" : "1"} w-full rounded-md p-2`}
+            onClick={() => setNewUser(!newUser)}
+          >
+            {newUser ? "Giriş yap" : "Kayıt ol"}
+          </button>
+        </div>
       </div>
     </div>
   );

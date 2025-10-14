@@ -1,26 +1,26 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import { login } from "./actions";
+import { signIn } from "./actions";
+import { useAuth } from "@/lib/AuthProvider";
+import { redirect } from "next/navigation";
 
-import { usemyContext } from "@/lib/auth/auth-provider";
+export function SignInForm() {
+  const [state, signInAction] = useActionState(signIn, undefined);
+  const { userId, handleSignIn } = useAuth();
 
-export function LoginForm() {
-  const [state, loginAction] = useActionState(login, undefined);
-
-  const { id, setId } = usemyContext();
-
+  useEffect(() => {
+    if (state?.success) handleSignIn(state?.user);
+  }, [state]);
   return (
     <form
-      action={loginAction}
+      action={signInAction}
       className="border-buttoncolor flex max-w-[300px] flex-col content-center gap-2 rounded-md border p-2"
     >
-      <button type="button" onClick={() => setId(id.concat("."))}>
-        aaaaa
-      </button>
+      <button type="button">{userId}</button>
       <div className="grid grid-cols-3">
-        Kullanıcı
+        e-Posta
         <input
           id="email"
           name="email"
@@ -58,7 +58,7 @@ function SubmitButton() {
       type="submit"
       className="bg-buttoncolor rounded-md p-2"
     >
-      Login
+      Giriş
     </button>
   );
 }
