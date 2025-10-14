@@ -36,3 +36,25 @@ VALUES (@fk_user,'email',@email,@password)`;
   const resultL = await request.query(sqlInsertAccount);
   console.log(resultL);
 }
+
+export async function signInDB(value: signUpData) {
+  const sqlSelectAccount: string = `SELECT pk_account
+      ,fk_user
+      ,providerId
+      ,accountId
+      ,accessToken
+      ,refreshToken
+      ,accessTokenExpiredAt
+      ,refreshTokenExpiredAt
+      ,password
+  FROM auth_account where accountId = @accountId
+`;
+
+  const Conn = await sql.connect(`${process.env.MMBISDATABASE}`);
+  const request = Conn.request();
+
+  request.input("accountId", sql.VarChar(100), value.email);
+
+  const result = await request.query(sqlSelectAccount);
+  return result.recordset;
+}

@@ -4,12 +4,7 @@ import { signInSchema, signUpSchema } from "@/lib/auth/scheme";
 import { createSession, deleteSession } from "../../lib/auth/session";
 import { revalidatePath } from "next/cache";
 import { hashSync, genSaltSync, compareSync } from "bcrypt-ts";
-import { signUpDB } from "@/lib/db/mssqlquery";
-const testUser = {
-  id: "1",
-  email: "c@c.io",
-  password: "123",
-};
+import { signInDB, signUpDB } from "@/lib/db/mssqlquery";
 
 export async function signUp(prevState: unknown, formData: FormData) {
   const data = Object.fromEntries(formData);
@@ -19,7 +14,7 @@ export async function signUp(prevState: unknown, formData: FormData) {
   if (!result.success) {
     return {
       data: data,
-      errors: z.treeifyError(result.error), //.flatten().fieldErrors,
+      errors: z.treeifyError(result.error),
     };
   }
   const d = {
@@ -48,26 +43,30 @@ export async function signUp(prevState: unknown, formData: FormData) {
   }
 }
 export async function signIn(prevState: unknown, formData: FormData) {
-  const result = signInSchema.safeParse(Object.fromEntries(formData));
+  const data = Object.fromEntries(formData);
+  const result = signInSchema.safeParse(data);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      data: data,
+      errors: z.treeifyError(result.error),
     };
   }
-
+  let user: string = "";
   const { email, password } = result.data;
+  const d = await signInDB({ username: "", email, password });
+  d.map((item) => {
+    if (compareSync(password, item.password)) user = item.fk_user;
+  });
 
-  if (email !== testUser.email || password !== testUser.password) {
+  if (!user)
     return {
-      errors: {
-        email: ["Invalid email or password"],
-      },
+      data: data,
+      errorpassword: ["Geçersiz kullanıcı adı veya şifre.!"],
     };
-  }
+  await createSession(user);
 
-  await createSession(testUser.id);
-  return { success: true, user: testUser.id };
+  return { success: true, user };
 }
 
 export async function logout() {

@@ -25,7 +25,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
       .then((response) => response.json())
       .then((d) => {
-        console.log(d);
         if (d) {
           setIsAuthenticated(true);
           setUserId(d);

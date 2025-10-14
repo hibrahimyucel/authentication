@@ -45,7 +45,7 @@ export function SignUpForm() {
             name="email"
             placeholder={inf.eMail}
             defaultValue={state?.data?.email?.toString()}
-            className="bg-editbox focus:bg-editboxfocus col-span-2 w-full rounded-sm p-0.5 pl-1 outline-0"
+            className="bg-editbox focus:bg-editboxfocus w-full rounded-sm p-0.5 pl-1 outline-0"
           />
           {state?.errors?.properties?.email && (
             <p className="text-red-500">
@@ -59,7 +59,7 @@ export function SignUpForm() {
             type="password"
             placeholder={inf.Password}
             defaultValue={state?.data?.password?.toString()}
-            className="bg-editbox focus:bg-editboxfocus col-span-2 w-full rounded-sm p-0.5 pl-1 outline-0"
+            className="bg-editbox focus:bg-editboxfocus w-full rounded-sm p-0.5 pl-1 outline-0"
           />
           {state?.errors?.properties?.password && (
             <p className="text-red-500">
@@ -73,7 +73,7 @@ export function SignUpForm() {
             type="password"
             placeholder={inf.PasswordAgain}
             defaultValue={state?.data?.password1?.toString()}
-            className="bg-editbox focus:bg-editboxfocus col-span-2 w-full rounded-sm p-0.5 pl-1 outline-0"
+            className="bg-editbox focus:bg-editboxfocus w-full rounded-sm p-0.5 pl-1 outline-0"
           />
           {state?.errors?.properties?.password1 && (
             <p className="text-red-500">
