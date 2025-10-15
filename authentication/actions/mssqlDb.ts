@@ -37,18 +37,20 @@ export async function sendPassword(email: string) {
   const success = await sendEmail({
     name: "",
     email: email,
-    subject: "Muhasip e-posta onay kodu",
-    description: `Muhasip kayıt-şifre işleminizi tamamlamak için onay kodunuz : <b> ${resPwd.recordset[0].value}<b>`,
+    subject: "Şifre yenileme",
+    description: `Platforma giriş için yeni şifreniz : <b> ${resPwd.recordset[0].value}<b>`,
   });
 
   return success;
 }
 export async function sendeMailVerify(value: string) {
   const sqlDeleteVerify: string = `DELETE auth_verify WHERE expiresAt<=GETDATE() or email = @email`;
+
   const sqlInsertVerify = `INSERT auth_verify
-select @email as email, cast (round(rand()*1000000,6) as varchar(6)) as value,
-DATEADD(minute,5, GETDATE()) as expiresAt`;
+select @email as email, cast (round(rand()*1000000,6) as varchar(6)) as value, DATEADD(minute,5, GETDATE()) as expiresAt`;
+
   const sqlSelectVerify: string = `select value from auth_verify WHERE expiresAt>=GETDATE() and email = @email`;
+
   if (!mmbisConn.connected) await mmbisConn.connect();
   const request = mmbisConn.request();
 
@@ -60,8 +62,8 @@ DATEADD(minute,5, GETDATE()) as expiresAt`;
   const success = await sendEmail({
     name: "",
     email: value,
-    subject: "Muhasip e-posta onay kodu",
-    description: `Muhasip kayıt-şifre işleminizi tamamlamak için onay kodunuz : <b> ${result.recordset[0].value}<b>`,
+    subject: "e-posta onay kodu",
+    description: `e-Posta onay kodunuz : <b> ${result.recordset[0].value}<b>`,
   });
 
   return success;

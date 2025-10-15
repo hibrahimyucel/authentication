@@ -18,29 +18,30 @@ export function ForgotPasswordForm() {
   return (
     <form
       action={forgotPasswordAction}
-      className="border-buttoncolor flex w-[300px] max-w-[300px] flex-col gap-1 rounded-md border p-1 text-nowrap"
+      className="border-buttoncolor flex w-[300px] max-w-[300px] flex-col rounded-md border p-1 text-nowrap"
     >
-      e-Posta
+      <p className="pt-1">e-Posta</p>
       <input
         id="email"
         name="email"
         placeholder="Email"
         defaultValue={state?.data?.email.toString()}
-        className="bg-editbox focus:bg-editboxfocus w-full rounded-sm p-0.5 pl-1 outline-0"
+        className="bg-editbox border-buttoncolor focus:bg-editboxfocus w-full rounded-sm border p-1 outline-0"
       />
       {state?.errors?.properties?.email && (
         <p className="text-red-500">
           {state?.errors?.properties?.email.errors}
         </p>
       )}
-      Onay kodu
+      <p className="pt-1">Onay kodu</p>
+
       <input
         id="emailverify"
         name="emailverify"
         placeholder={"Adresinize gönderilen onay kodu"}
         maxLength={6}
         defaultValue={state?.data?.emailverify?.toString()}
-        className="bg-editbox border-buttoncolor focus:bg-editboxfocus w-full rounded-sm border p-0.5 pl-1 outline-0"
+        className="bg-editbox border-buttoncolor focus:bg-editboxfocus w-full rounded-sm border p-1 outline-0"
       />
       {state?.errors?.properties?.emailverify && (
         <p className="text-red-500">
@@ -48,6 +49,7 @@ export function ForgotPasswordForm() {
         </p>
       )}
       {state?.error && <p className="text-red-500">{state?.error}</p>}
+      <p className="p-2"></p>
       <button
         disabled={isPending}
         type="submit"

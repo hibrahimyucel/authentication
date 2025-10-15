@@ -7,39 +7,44 @@ import { useAuth } from "../context/authProvider";
 export function SignInForm() {
   const [state, signInAction, isPending] = useActionState(signIn, undefined);
   const { user, setUser } = useAuth();
+
   if (user) redirect("/dashboard");
+
   useEffect(() => {
     if (state?.success) {
       setUser(state?.user);
       redirect("/");
     }
   }, [state]);
+
   return (
     <form
       action={signInAction}
-      className="border-buttoncolor flex w-[300px] max-w-[300px] flex-col gap-1 rounded-md border p-1 text-nowrap"
+      className="border-buttoncolor flex w-[300px] max-w-[300px] flex-col rounded-md border p-1 text-nowrap"
     >
-      e-Posta
+      <p className="pt-1"> e-Posta</p>
       <input
         id="email"
         name="email"
         placeholder="Email"
+        type="email"
         defaultValue={state?.data?.email.toString()}
-        className="bg-editbox focus:bg-editboxfocus w-full rounded-sm p-0.5 pl-1 outline-0"
+        className="bg-editbox border-buttoncolor focus:bg-editboxfocus w-full rounded-sm border p-1 outline-0"
       />
       {state?.errors?.properties?.email && (
         <p className="text-red-500">
           {state?.errors?.properties?.email.errors}
         </p>
       )}
-      Şifre
+      <p className="pt-1">Şifre</p>
+
       <input
         id="password"
         name="password"
         type="password"
         placeholder="Password"
         defaultValue={state?.data?.password.toString()}
-        className="bg-editbox focus:bg-editboxfocus w-full rounded-sm p-0.5 pl-1 outline-0"
+        className="bg-editbox border-buttoncolor focus:bg-editboxfocus w-full rounded-sm border p-1 outline-0"
       />
       {state?.errors?.properties?.password && (
         <p className="text-red-500">
@@ -49,6 +54,7 @@ export function SignInForm() {
       {state?.errorpassword && (
         <p className="text-red-500">{state?.errorpassword}</p>
       )}
+      <p className="p-2"></p>
       <button
         disabled={isPending}
         type="submit"
