@@ -1,22 +1,23 @@
 "use client";
 import { useActionState, useEffect } from "react";
 import { redirect } from "next/navigation";
-import { signIn } from "../actions/actions";
-import { useAuth } from "../context/authProvider";
+import { forgotPassword } from "../actions/actions";
 
-export function SignInForm() {
-  const [state, signInAction, isPending] = useActionState(signIn, undefined);
-  const { user, setUser } = useAuth();
-  if (user) redirect("/dashboard");
+export function ForgotPasswordForm() {
+  const [state, forgotPasswordAction, isPending] = useActionState(
+    forgotPassword,
+    undefined,
+  );
+
   useEffect(() => {
     if (state?.success) {
-      setUser(state?.user);
-      redirect("/");
+      alert("Şifreniz e-posta hesabınıza gönderildi.");
+      redirect("/login");
     }
   }, [state]);
   return (
     <form
-      action={signInAction}
+      action={forgotPasswordAction}
       className="border-buttoncolor flex w-[300px] max-w-[300px] flex-col gap-1 rounded-md border p-1 text-nowrap"
     >
       e-Posta
@@ -32,29 +33,27 @@ export function SignInForm() {
           {state?.errors?.properties?.email.errors}
         </p>
       )}
-      Şifre
+      Onay kodu
       <input
-        id="password"
-        name="password"
-        type="password"
-        placeholder="Password"
-        defaultValue={state?.data?.password.toString()}
-        className="bg-editbox focus:bg-editboxfocus w-full rounded-sm p-0.5 pl-1 outline-0"
+        id="emailverify"
+        name="emailverify"
+        placeholder={"Adresinize gönderilen onay kodu"}
+        maxLength={6}
+        defaultValue={state?.data?.emailverify?.toString()}
+        className="bg-editbox border-buttoncolor focus:bg-editboxfocus w-full rounded-sm border p-0.5 pl-1 outline-0"
       />
-      {state?.errors?.properties?.password && (
+      {state?.errors?.properties?.emailverify && (
         <p className="text-red-500">
-          {state?.errors?.properties?.password.errors}
+          {state?.errors?.properties?.emailverify.errors}
         </p>
       )}
-      {state?.errorpassword && (
-        <p className="text-red-500">{state?.errorpassword}</p>
-      )}
+      {state?.error && <p className="text-red-500">{state?.error}</p>}
       <button
         disabled={isPending}
         type="submit"
         className="bg-buttoncolor border-diffcolor hover:bg-editbox cursor-pointer rounded-md border p-2"
       >
-        Giriş
+        Şifre Gönder
       </button>
     </form>
   );

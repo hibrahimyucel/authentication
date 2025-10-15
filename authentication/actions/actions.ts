@@ -2,29 +2,40 @@
 import { z } from "zod";
 import { createSession, deleteSession } from "./session";
 import { hashSync, compareSync } from "bcrypt-ts";
-import { signInDB, signUpDB } from "./mssqlDb";
+import {
+  checkeMail,
+  checkeMailVerify,
+  sendeMailVerify,
+  sendPassword,
+  signInDB,
+  signUpDB,
+} from "./mssqlDb";
 
 const signInSchema = z.object({
   email: z.email({ message: "Geçersiz e-posta" }).trim(),
   password: z
     .string()
-    .min(3, { message: "Şifre en az 3 karakter olmalı" })
+    .min(1, { message: "Şifre en az 1 karakter olmalı" })
     .trim(),
 });
-
+const forgotPasswordSchema = z.object({
+  email: z.email({ message: "Geçersiz e-posta" }).trim(),
+  emailverify: z.string(),
+});
 const signUpSchema = z
   .object({
     username: z
       .string()
-      .min(3, { message: "Kullanıcı adı en az 3 karakter olmalı" }),
+      .min(1, { message: "Kullanıcı adı en az 3 karakter olmalı" }),
     email: z.email({ message: "Geçersiz e-posta" }).trim(),
+    emailverify: z.string(),
     password: z
       .string()
-      .min(3, { message: "Şifre en az 3 karakter olmalı" })
+      .min(1, { message: "Şifre en az 3 karakter olmalı" })
       .trim(),
     password1: z
       .string()
-      .min(3, { message: "Şifre en az 3 karakter olmalı" })
+      .min(1, { message: "Şifre en az 3 karakter olmalı" })
       .trim(),
   })
   .refine((data) => data.password === data.password1, {
@@ -42,29 +53,44 @@ export async function signUp(prevState: unknown, formData: FormData) {
       errors: z.treeifyError(result.error),
     };
   }
-  const d = {
+  const dbData = {
     username: result.data.username,
     email: result.data.email,
     password: hashSync(result.data.password),
   };
   try {
-    const s = await signUpDB(d);
+    if (await checkeMail(dbData.email))
+      throw new Error("Bu e-mail daha önce kaydedilmiş.!");
+
+    if (!result.data.emailverify) {
+      const success = await sendeMailVerify(dbData.email);
+      if (success.success)
+        throw new Error(
+          "Onay kodunuz gönderildi. e-posta hesabınızı kontrol edin",
+        );
+      else throw new Error(success.message);
+    } else if (
+      !(await checkeMailVerify(result.data.email, result.data.emailverify))
+    )
+      throw new Error("Onay kodu bulunamadı.!");
+  } catch (error) {
+    return {
+      data: data,
+      error: (error as Error).message,
+    };
+  }
+
+  try {
+    await signUpDB(dbData);
     return {
       data: data,
       success: true,
     };
   } catch (error) {
-    const e = (error as Error).message;
-    if (e.includes("PK_auth_user"))
-      return {
-        data: data,
-        error: "Bu e-mail daha önce kaydedilmiş.!",
-      };
-    else
-      return {
-        data: data,
-        error: (error as Error).message,
-      };
+    return {
+      data: data,
+      error: (error as Error).message,
+    };
   }
 }
 export async function signIn(prevState: unknown, formData: FormData) {
@@ -81,7 +107,7 @@ export async function signIn(prevState: unknown, formData: FormData) {
   const { email, password } = result.data;
   const d = await signInDB({ username: "", email, password });
   d.map((item) => {
-    if (compareSync(password, item.password)) user = item.fk_user;
+    if (compareSync(password, item.password)) user = item.pk_user;
   });
 
   if (!user)
@@ -92,6 +118,42 @@ export async function signIn(prevState: unknown, formData: FormData) {
   await createSession(user);
 
   return { success: true, user };
+}
+
+export async function forgotPassword(prevState: unknown, formData: FormData) {
+  const data = Object.fromEntries(formData);
+  const result = forgotPasswordSchema.safeParse(data);
+
+  if (!result.success) {
+    return {
+      data: data,
+      errors: z.treeifyError(result.error),
+    };
+  }
+
+  const { email, emailverify } = result.data;
+
+  try {
+    if (!(await checkeMail(email))) throw new Error("Hesap bulunamadı.!");
+
+    if (!emailverify) {
+      const success = await sendeMailVerify(email);
+      if (success.success)
+        throw new Error(
+          "Onay kodunuz gönderildi. e-posta hesabınızı kontrol edin",
+        );
+      if (!success.success) throw new Error(success.message);
+    } else if (!(await checkeMailVerify(email, emailverify)))
+      throw new Error("Onay kodu bulunamadı.!");
+    await sendPassword(email);
+  } catch (error) {
+    return {
+      data: data,
+      error: (error as Error).message,
+    };
+  }
+
+  return { success: true };
 }
 
 export async function logout() {

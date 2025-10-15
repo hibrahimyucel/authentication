@@ -6,22 +6,16 @@ const publicRoutes = ["/login", "/"];
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
-
   const isPublicRoute = publicRoutes.includes(path);
-
   const cookie = (await cookies()).get("session")?.value;
-
   const session = await decrypt(cookie);
 
-  /*
-  if (isPublicRoute) {
-    if (path == publicRoutes[0] && session?.userId)
-      return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
-    else return NextResponse.next();
-  }
   if (!isPublicRoute && !session?.userId) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
-  }*/
+  }
+
+  if (path == publicRoutes[0] && session?.userId)
+    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
 }
 export const config = {
   matcher: [
